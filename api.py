@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import time
 import ConfigParser
 import RPi.GPIO as GPIO
 import serial
@@ -88,11 +88,18 @@ def sport_in(input_sport):
 	return "Valor no corresponde"
 
 
-# leer un mensaje en arduino via serial
+# escribir un mensaje en arduino via serial
 @app.route('/ard/read/<input_sread>', methods = [ 'GET'])
 def sread_in(input_sread):
     if input_sread == 'all':
-        s.readline()
+       i= 0
+       while (1 < 4): 
+	   time.sleep(1)
+           msg = s.readline()
+           return msg
+#           s.flush()
+       i = i + 1
+
     else:
         return "No existen valores"
 
