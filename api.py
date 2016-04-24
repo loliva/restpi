@@ -2,8 +2,10 @@
 
 import ConfigParser
 import RPi.GPIO as GPIO
+import serial
 from flask import Flask, jsonify, url_for, abort, make_response, request
 GPIO.setwarnings(False)
+
 
 # Configuracion Base
 config = ConfigParser.RawConfigParser()
@@ -14,6 +16,9 @@ allowed_ports = ['port1', 'port2', 'port3', 'port4', 'port5', 'port6']
 
 # Seteo GPIO
 GPIO.setmode(GPIO.BOARD)
+
+# Defino el serial
+s = serial.Serial('/dev/ttyACM0', 9600)
 
 for port in allowed_ports:
     GPIO.setup(config.getint(port, 'gpio_pin'), GPIO.OUT)
@@ -55,7 +60,7 @@ def port_off(input_port):
     GPIO.output(config.getint(port, 'gpio_pin'), False)
     return "Off"
 
-# Toggle LED
+# Toggle 
 @app.route('/port/<input_port>/toggle', methods = [ 'PUT' ])
 def port_toggle(input_port):
     port = input_port.lower()
@@ -68,6 +73,28 @@ def port_toggle(input_port):
         return "On"
     else:
         return "Off"
+
+
+# escribir un mensaje en arduino via serial
+@app.route('/ard/<input_sport>', methods = [ 'PUT'])
+def sport_in(input_sport):
+    if input_sport == '1':
+	s.write(input_sport)
+	return "encendido"
+    if input_sport == '0':
+	s.write(input_sport)
+	return "apagado"
+    else:
+	return "Valor no corresponde"
+
+
+# leer un mensaje en arduino via serial
+@app.route('/ard/read/<input_sread>', methods = [ 'GET'])
+def sread_in(input_sread):
+    if input_sread == 'all':
+        s.readline()
+    else:
+        return "No existen valores"
 
 
 
